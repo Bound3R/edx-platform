@@ -1515,7 +1515,9 @@ class TestCertificateGeneration(InstructorTaskModuleTestCase):
                 mock_current_task.return_value = current_task
                 with patch('capa.xqueue_interface.XQueueInterface.send_to_queue') as mock_queue:
                     mock_queue.return_value = (0, "Successfully queued")
-                    result = generate_students_certificates(None, None, self.course.id, None, 'certificates generated')
+                    result = generate_students_certificates(
+                        None, None, self.course.id, None, 'certificates generated'
+                    )
         self.assertDictContainsSubset(
             {
                 'action_name': 'certificates generated',

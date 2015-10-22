@@ -27,6 +27,7 @@ from instructor_task.tasks import (
     calculate_may_enroll_csv,
     exec_summary_report_csv,
     generate_certificates,
+    generate_specific_students_certificates,
     proctored_exam_results_csv
 )
 
@@ -473,6 +474,28 @@ def generate_certificates_for_all_students(request, course_key):   # pylint: dis
     task_type = 'generate_certificates_all_student'
     task_class = generate_certificates
     task_input = {}
+    task_key = ""
+
+    return submit_task(request, task_type, task_class, course_key, task_input, task_key)
+
+
+def generate_certificates_for_students(request, course_key, students=None):  # pylint: disable=invalid-name
+    """
+    Submits a task to generate certificates for given students enrolled in the course or
+    all students if argument 'students' is None
+
+    Raises AlreadyRunningError if certificates are currently being generated.
+    """
+    if students:
+        task_type = 'generate_certificates_certain_student'
+        task_class = generate_specific_students_certificates
+        students = [student.id for student in students]
+        task_input = {'students': students}
+    else:
+        task_type = 'generate_certificates_all_student'
+        task_class = generate_certificates
+        task_input = {}
+
     task_key = ""
 
     return submit_task(request, task_type, task_class, course_key, task_input, task_key)

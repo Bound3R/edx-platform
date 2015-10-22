@@ -1,0 +1,4 @@
+<input id="certificate-exception" type="text" placeholder="Student email or username">
+<textarea id="free-text-notes" rows="10" placeholder="Free text notes"></textarea>
+<input type="button" id="add-exception" value="Add Exception">
+<div class='error-message'></div>

@@ -1346,6 +1346,51 @@ def generate_students_certificates(
     """
     start_time = time()
     enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+
+    task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
+
+    current_step = {'step': 'Calculating students already have certificates'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    students_require_certs = students_require_certificate(course_id, enrolled_students)
+
+    task_progress.skipped = task_progress.total - len(students_require_certs)
+
+    current_step = {'step': 'Generating Certificates'}
+    task_progress.update_task_state(extra_meta=current_step)
+
+    course = modulestore().get_course(course_id, depth=0)
+    # Generate certificate for each student
+    for student in students_require_certs:
+        task_progress.attempted += 1
+        status = generate_user_certificates(
+            student,
+            course_id,
+            course=course
+        )
+
+        if status in [CertificateStatuses.generating, CertificateStatuses.downloadable]:
+            task_progress.succeeded += 1
+        else:
+            task_progress.failed += 1
+
+    return task_progress.update_task_state(extra_meta=current_step)
+
+
+def generate_student_specific_certificates(  # pylint: disable=invalid-name
+        _xmodule_instance_args, _entry_id, course_id, task_input, action_name):  # pylint: disable=unused-argument
+    """
+    For a given `course_id`, generate certificates for given students or all students if argument 'students' is None
+    that are enrolled.
+    """
+    start_time = time()
+    enrolled_students = CourseEnrollment.objects.users_enrolled_in(course_id)
+    instructor_task = InstructorTask.objects.get(pk=_entry_id)
+    task_input = json.loads(instructor_task.task_input)
+    students = task_input.get('students', [])
+
+    enrolled_students = enrolled_students.filter(id__in=students)
+
     task_progress = TaskProgress(action_name, enrolled_students.count(), start_time)
 
     current_step = {'step': 'Calculating students already have certificates'}

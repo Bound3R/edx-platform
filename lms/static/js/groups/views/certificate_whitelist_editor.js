@@ -1,0 +1,86 @@
+// Backbone Application View: CertificateWhitelist View
+/*global define, RequireJS */
+
+;(function(define){
+    'use strict';
+
+    define([
+            'jquery',
+            'underscore',
+            'gettext',
+            'backbone',
+            'js/groups/models/certificate_exception'
+        ],
+
+        function($, _, gettext, Backbone, CertificateException){
+            return Backbone.View.extend({
+                el: "#certificate-white-list-editor",
+                error_div: '.error-message',
+
+                events: {
+                    'click #add-exception': 'addToWhiteList'
+                },
+
+                initialize: function(options){
+                    this.certificateWhiteList = options.certificateWhiteList;
+                },
+
+                render: function(){
+                    var template = this.loadTemplate('certificate-white-list-editor');
+
+                    this.$el.html(template());
+
+                },
+
+                loadTemplate: function(name) {
+                    var templateSelector = "#" + name + "-tpl",
+                    templateText = $(templateSelector).text();
+                    return _.template(templateText);
+                },
+
+                addToWhiteList: function(){
+                    var value = $("#certificate-exception").val();
+                    var free_text = $("#free-text-notes").val();
+
+                    var user_email = '', user_name='';
+
+                    if(this.isEmailAddress(value)){
+                        user_email = value;
+                    }
+                    else{
+                        user_name = value;
+                    }
+
+                    var certificate_exception = new CertificateException({
+                        user_name: user_name,
+                        user_email: user_email,
+                        free_text: free_text
+                    });
+
+                    if(this.certificateWhiteList.containsModel({user_name: user_name, user_email: user_email})){
+                        this.showErrorMessage("username/email already in exception list");
+                    }
+                    else if(certificate_exception.isValid()){
+                        this.certificateWhiteList.add(certificate_exception, {validate: true});
+                    }
+                    else{
+                        this.showErrorMessage(certificate_exception.validationError);
+                    }
+                },
+
+                isEmailAddress: function validateEmail(email) {
+                    var re = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
+                    return re.test(email);
+                },
+
+                showErrorMessage: function(message){
+                    $(this.error_div).html("<div class='msg-error'>" + message + "</div>");
+                    $('html, body').animate({
+                        scrollTop: $(this.error_div).offset().top
+                    }, 1000);
+                }
+
+            });
+        }
+    );
+}).call(this, define || RequireJS.define);
