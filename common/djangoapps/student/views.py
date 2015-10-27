@@ -677,7 +677,8 @@ def dashboard(request):
     # send key value pairs for course key and its count of total courses
     xseries_programs = {
         u'edX/DemoX/Demo_Course': 3,
-        u'XBlock/xb001/2015_R1': 2
+        u'XBlock/xb001/2015_R1': 2,
+        u'course-v1:pak+cs987+2015_t6': 5
     }
 
     context = {

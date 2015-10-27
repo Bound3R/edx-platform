@@ -1,4 +1,4 @@
-<%page args="is_xseries_course, xseries_mktg_url" />
+<%page args="is_xseries_course, xseries_mktg_url, course_overview" />
 <%!
     from django.utils.translation import ugettext as _
 %>
@@ -10,8 +10,16 @@
         <div class="message-copy xseries-msg">
             <p>
                 <strong>${_("XSeries Program: Interested in more courses in this subject?")}</strong>
+            <p>
+            <p>
+                ${_("This course is 1 of {total} courses in the {link_start}{course_display}{link_end}.").format(
+                    total=is_xseries_course,
+                    link_start='<a href="{}">'.format(xseries_mktg_url),
+                    link_end='</a>',
+                    course_display=course_overview.display_name_with_default,
+            )}
             </p>
-            <p>${_("This course is 1 of {total} courses in the {xseries_link}").format(total='', xseries_link=xseries_mktg_url)}</p>
+
         </div>
         <div class="purchase_credit">
             <a class="btn xseries-btn" href="#" target="_blank">

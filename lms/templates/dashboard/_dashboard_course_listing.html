@@ -349,7 +349,7 @@ from student.helpers import (
         %endif
 
         % if is_xseries_enabled and is_xseries_course:
-            <%include file="_dashboard_xseries_info.html" args="is_xseries_course=is_xseries_course, xseries_mktg_url=xseries_mktg_url" />
+            <%include file="_dashboard_xseries_info.html" args="is_xseries_course=is_xseries_course, xseries_mktg_url=xseries_mktg_url, course_overview=course_overview" />
         % endif
 
         % if is_course_blocked:
