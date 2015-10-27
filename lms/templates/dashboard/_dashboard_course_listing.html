@@ -1,4 +1,4 @@
-<%page args="course_overview, enrollment, show_courseware_link, cert_status, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings" />
+<%page args="course_overview, enrollment, show_courseware_link, cert_status, credit_status, show_email_settings, course_mode_info, show_refund_option, is_paid_course, is_course_blocked, verification_status, course_requirements, dashboard_index, share_settings, is_xseries_enabled, is_xseries_course, xseries_mktg_url" />
 
 <%!
 import urllib
@@ -44,6 +44,12 @@ from student.helpers import (
     <% mode_class = '' %>
   % endif
 <div class="course-container">
+ % if is_xseries_enabled and is_xseries_course:
+  <div class="xseries-container">
+    <i class="xseries-icon"></i>
+    <p class="message-copy">XSeries Program Course</p>
+  </div>
+ % endif
 <article class="course${mode_class}">
   <% course_target = reverse('info', args=[unicode(course_overview.id)]) %>
   <section class="details">
@@ -341,6 +347,10 @@ from student.helpers import (
             </div>
           </div>
         %endif
+
+        % if is_xseries_enabled and is_xseries_course:
+            <%include file="_dashboard_xseries_info.html" args="is_xseries_course=is_xseries_course, xseries_mktg_url=xseries_mktg_url" />
+        % endif
 
         % if is_course_blocked:
           <p id="block-course-msg" class="course-block">

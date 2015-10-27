@@ -1,0 +1,26 @@
+<%page args="is_xseries_course, xseries_mktg_url" />
+<%!
+    from django.utils.translation import ugettext as _
+%>
+<%namespace name='static' file='../static_content.html'/>
+
+<% xseries_link='<a href="#" target="_blank">Course Name</a>' %>
+<div class="message message-status is-shown credit-message">
+    <div class="xseries-action">
+        <div class="message-copy xseries-msg">
+            <p>
+                <strong>${_("XSeries Program: Interested in more courses in this subject?")}</strong>
+            </p>
+            <p>${_("This course is 1 of {total} courses in the {xseries_link}").format(total='', xseries_link=xseries_mktg_url)}</p>
+        </div>
+        <div class="purchase_credit">
+            <a class="btn xseries-btn" href="#" target="_blank">
+                <i class="action-xseries-icon"></i>
+                <span>
+                    ${_("View XSeries Details")}
+                </span>
+            </a>
+        </div>
+    </div>
+</div>
+

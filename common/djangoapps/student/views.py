@@ -5,6 +5,7 @@ import datetime
 import logging
 import uuid
 import json
+from urlparse import urljoin
 import warnings
 from collections import defaultdict
 from pytz import UTC
@@ -122,6 +123,7 @@ from eventtracking import tracker
 from notification_prefs.views import enable_notifications
 
 # Note that this lives in openedx, so this dependency should be refactored.
+from openedx.core.djangoapps.programs.models import ProgramsApiConfig
 from openedx.core.djangoapps.user_api.preferences import api as preferences_api
 
 
@@ -664,6 +666,20 @@ def dashboard(request):
     else:
         redirect_message = ''
 
+    # TODO this method will hit the openedx to get user xseries info
+    xseries_programs = _get_xseries_programs(
+        request.user.username, [
+            unicode(enrollment.course_id)
+            for enrollment in course_enrollments
+        ]
+    )
+
+    # send key value pairs for course key and its count of total courses
+    xseries_programs = {
+        u'edX/DemoX/Demo_Course': 3,
+        u'XBlock/xb001/2015_R1': 2
+    }
+
     context = {
         'enrollment_message': enrollment_message,
         'redirect_message': redirect_message,
@@ -693,10 +709,13 @@ def dashboard(request):
         'order_history_list': order_history_list,
         'courses_requirements_not_met': courses_requirements_not_met,
         'nav_hidden': True,
+        'xseries_programs': xseries_programs,
+        'is_xseries_enabled': ProgramsApiConfig.current().is_student_dashboard_enabled,
+        'xseries_mktg_url': urljoin(settings.MKTG_URLS.get('ROOT'), 'xseries' + '/marketing')
+
     }
 
     return render_to_response('dashboard.html', context)
-
 
 def _create_recent_enrollment_message(course_enrollments, course_modes):  # pylint: disable=invalid-name
     """
@@ -2257,3 +2276,9 @@ def change_email_settings(request):
         track.views.server_track(request, "change-email-settings", {"receive_emails": "no", "course": course_id}, page='dashboard')
 
     return JsonResponse({"success": True})
+
+
+def _get_xseries_programs(username, user_enrolled_courses): # pylint: disable=invalid-name
+    # make the call to openedx/core/lib/programs/utils and get the programs
+    #response = get_course_programs_for_dashboard(username, user_enrolled_courses)
+    pass
